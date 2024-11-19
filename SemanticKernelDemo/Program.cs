@@ -1,13 +1,5 @@
 ﻿using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
-using Microsoft.SemanticKernel.Connectors.OpenAI;
-using System.Net;
-using Azure.AI.OpenAI;
-using Azure.Search.Documents;
-using Azure;
-using Microsoft.Extensions.DependencyInjection;
-using Azure.Search.Documents.Models;
-using SemanticKernelDemo;
 
 Console.OutputEncoding = System.Text.Encoding.UTF8;
 Console.InputEncoding = System.Text.Encoding.UTF8;
