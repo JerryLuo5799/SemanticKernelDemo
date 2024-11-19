@@ -1,0 +1,48 @@
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.cache
+*.dbmdl
+*.opendb
+*.VC.opendb
+
+# Build Results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+build/
+bld/
+[Bb]in/
+[Oo]bj/
+
+# NuGet
+*.nupkg
+packages/
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Visual Studio 2017
+*.vcxproj.user
+*.version
+*.dotCover
+
+# Resharper
+_ReSharper.Caches/
+
+# macOS
+.DS_Store
+
+# Windows
+[Tt]humbs.db
+[Dd]esktop.ini
+
+# Rider
+.idea/
+*.sln.iml
+
+# Visual Studio Code
+.vscode/
+/SemanticKernelDemo/Config.cs
