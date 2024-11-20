@@ -1,5 +1,7 @@
 ﻿using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
+using Microsoft.SemanticKernel.Connectors.OpenAI;
+using SemanticKernelDemo.Plugin;
 
 Console.OutputEncoding = System.Text.Encoding.UTF8;
 Console.InputEncoding = System.Text.Encoding.UTF8;
@@ -7,9 +9,18 @@ Console.InputEncoding = System.Text.Encoding.UTF8;
 // Create a kernel with Azure OpenAI chat completion
 var builder = Kernel.CreateBuilder().AddAzureOpenAIChatCompletion(Config.DEPLOYMENT_NAME, Config.ENDPOINT, Config.API_KEY);
 
+// Add the plugin to the kernel
+builder.Plugins.AddFromType<WeatherPlugin>("Weather");
+
 // Build the kernel
 Kernel kernel = builder.Build();
 var chatCompletionService = kernel.GetRequiredService<IChatCompletionService>();
+
+// 2. Enable automatic function calling
+PromptExecutionSettings executionSettings = new()
+{
+    FunctionChoiceBehavior = FunctionChoiceBehavior.Auto()
+};
 
 // Create a history store the conversation
 var history = new ChatHistory("""
@@ -30,7 +41,7 @@ do
     history.AddUserMessage(userInput);
 
     // Get the response from the AI
-    var result = await chatCompletionService.GetChatMessageContentAsync(history, null, kernel);
+    var result = await chatCompletionService.GetChatMessageContentAsync(history, executionSettings, kernel);
 
     // Print the results
     Console.ForegroundColor = ConsoleColor.White;
