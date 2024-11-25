@@ -35,14 +35,14 @@ namespace SemanticKernelDemo.Plugin
         [KernelFunction("get_weather_of_city")]
         [Description("Get the current weather in a given city.")]
         [return: Description("The current weather of given city")]
-        public async Task<Weather> GetWeatherOfCityAsync(CityModel city)
+        public async Task<WeatherModel> GetWeatherOfCityAsync(CityModel city)
         {
             return city.Code switch
             {
-                "hangzhou" => new Weather { Temperature = 5, Condition = "下雨" },
-                "beijing" => new Weather { Temperature = 10, Condition = "多云" },
-                "shanghai" => new Weather { Temperature = 15, Condition = "晴" },
-                _ => new Weather { Temperature = 0, Condition = "未知" }
+                "hangzhou" => new WeatherModel { Temperature = 5, Condition = "下雨" },
+                "beijing" => new WeatherModel { Temperature = 10, Condition = "多云" },
+                "shanghai" => new WeatherModel { Temperature = 15, Condition = "晴" },
+                _ => new WeatherModel { Temperature = 0, Condition = "未知" }
             };
         }
     }
@@ -53,12 +53,12 @@ namespace SemanticKernelDemo.Plugin
         public string Name { get; set; }
     }
 
-    public class Weather
+    public class WeatherModel
     {
         public int Temperature { get; set; }
         public string Condition { get; set; }
 
-        public override string ToString() => $"当前的天气情况为: (温度: {this.Temperature} ℃, 天气: {this.Condition})";
+        public string ToString() => $"当前的天气情况为: (温度: {this.Temperature} ℃, 天气: {this.Condition})";
     }
 }
 
