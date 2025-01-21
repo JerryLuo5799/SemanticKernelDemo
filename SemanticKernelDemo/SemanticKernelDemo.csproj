@@ -9,7 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="Azure.Search.Documents" Version="11.6.0" />
-    <PackageReference Include="Microsoft.SemanticKernel" Version="1.29.0" />
+    <PackageReference Include="Microsoft.SemanticKernel" Version="1.33.0" />
   </ItemGroup>
 
 </Project>

@@ -1,0 +1,18 @@
+{
+    "schema": 1,
+    "type": "completion",
+    "description": "从文本内容中识别出主体, 包括人名、地点、事件内容与时间，并返回JSON格式的实体信息",
+    "input_parameters": {
+    "input": {
+      "type": "string",
+      "description": "用户输入的文本，需要从中识别出主体信息"
+    }
+  }, 
+    "completion": {
+      "max_tokens": 512,
+      "temperature": 0.1,
+      "top_p": 1,
+      "presence_penalty": 0,
+      "frequency_penalty": 0
+    }
+  }

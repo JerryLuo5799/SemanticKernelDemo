@@ -11,10 +11,20 @@ var builder = Kernel.CreateBuilder().AddAzureOpenAIChatCompletion(Config.DEPLOYM
 
 // Add the plugin to the kernel
 builder.Plugins.AddFromType<WeatherPlugin>("Weather");
+builder.Plugins.AddFromPromptDirectory("Plugin");
 
 // Build the kernel
 Kernel kernel = builder.Build();
 var chatCompletionService = kernel.GetRequiredService<IChatCompletionService>();
+
+foreach (var plugin in kernel.Plugins)
+{
+    Console.WriteLine("plugin: " + plugin.Name);
+    foreach (var function in plugin)
+    {
+        Console.WriteLine("  - prompt function: " + function.Name);
+    }
+}
 
 // 2. Enable automatic function calling
 PromptExecutionSettings executionSettings = new()
@@ -24,8 +34,8 @@ PromptExecutionSettings executionSettings = new()
 
 // Create a history store the conversation
 var history = new ChatHistory("""
-    You are an AI assistant that helps people find information,  you will provide all the detailed information.
-    You like to speak Chinese, you don't output results in Markdown format.
+    你是一个AI助手。你总是会调用插件来回答用户的问题, 如果用户的请求可以通过插件来满足, 那就只调用插件。你不会更改插件的返回内容。
+    你会用中文输出回答的内容, 并且绝对不适用Markdown格式
     """);
 
 // Initiate a back-and-forth chat
@@ -35,8 +45,8 @@ do
     // Collect user input
     Console.ForegroundColor = ConsoleColor.Red;
     Console.Write("User > ");
-    userInput = Console.ReadLine();
 
+    userInput = Console.ReadLine();
     // Add user input
     history.AddUserMessage(userInput);
 
