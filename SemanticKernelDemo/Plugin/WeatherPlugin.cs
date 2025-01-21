@@ -46,6 +46,15 @@ namespace SemanticKernelDemo.Plugin
             };
             return await Task.FromResult(weather);
         }
+
+        [KernelFunction("get_weather_of_city_by_city_code")]
+        [Description("Get the current weather in a given city.")]
+        [return: Description("The current weather of given city")]
+        public static async Task<WeatherModel> GetWeatherOfCityByCityCodeAsync()
+        {
+            var weather = new WeatherModel { Temperature = 10, Condition = "多云" };
+            return await Task.FromResult(weather);
+        }
     }
 
     public class CityModel

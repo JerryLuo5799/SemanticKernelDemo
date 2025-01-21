@@ -6,6 +6,11 @@
     "input": {
       "type": "string",
       "description": "用户输入的文本，需要从中识别出主体信息"
+    },
+    "locations": {
+        "type": "string",
+        "description": "查询天气的城市",
+        "default": "shanghai"
     }
   }, 
     "completion": {
