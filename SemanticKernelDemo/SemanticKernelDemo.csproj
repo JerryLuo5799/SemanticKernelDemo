@@ -5,13 +5,14 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <NoWarn>SKEXP0050</NoWarn> <!-- 添加这一行来抑制警告 -->
+    <NoWarn>SKEXP0050, SKEXP0040</NoWarn> <!-- 添加这一行来抑制警告 -->
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Azure.Search.Documents" Version="11.6.0" />
     <PackageReference Include="Microsoft.SemanticKernel" Version="1.33.0" />
     <PackageReference Include="Microsoft.SemanticKernel.Plugins.Core" Version="1.33.0-alpha" />
+    <PackageReference Include="Microsoft.SemanticKernel.Plugins.OpenApi" Version="1.33.0-preview" />
   </ItemGroup>
 
   <ItemGroup>

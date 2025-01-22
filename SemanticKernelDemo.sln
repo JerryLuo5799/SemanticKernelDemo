@@ -4,6 +4,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.11.35327.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SemanticKernelDemo", "SemanticKernelDemo\SemanticKernelDemo.csproj", "{7435D89A-97DF-48B1-A61C-313A76385F5D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{5C5884C7-3BAC-4BB7-805D-BA50820E6D24} = {5C5884C7-3BAC-4BB7-805D-BA50820E6D24}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Module.API", "Module.API\Module.API.csproj", "{5C5884C7-3BAC-4BB7-805D-BA50820E6D24}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +20,10 @@ Global
 		{7435D89A-97DF-48B1-A61C-313A76385F5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7435D89A-97DF-48B1-A61C-313A76385F5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7435D89A-97DF-48B1-A61C-313A76385F5D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5C5884C7-3BAC-4BB7-805D-BA50820E6D24}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C5884C7-3BAC-4BB7-805D-BA50820E6D24}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C5884C7-3BAC-4BB7-805D-BA50820E6D24}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C5884C7-3BAC-4BB7-805D-BA50820E6D24}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
