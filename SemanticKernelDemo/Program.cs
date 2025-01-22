@@ -19,7 +19,7 @@ builder.Plugins.AddFromType<TimePlugin>("Time");
 // Build the kernel
 Kernel kernel = builder.Build();
 
-await kernel.ImportPluginFromOpenApiAsync("lights", new Uri("https://localhost:7293/swagger/v1/swagger.json"), new OpenApiFunctionExecutionParameters() { EnablePayloadNamespacing = true });
+await kernel.ImportPluginFromOpenApiAsync("Schedule", new Uri("https://localhost:7293/swagger/v1/swagger.json"), new OpenApiFunctionExecutionParameters() { EnablePayloadNamespacing = true });
 
 var chatCompletionService = kernel.GetRequiredService<IChatCompletionService>();
 
