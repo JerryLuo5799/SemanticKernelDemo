@@ -28,7 +28,7 @@ foreach (var plugin in kernel.Plugins)
     Console.WriteLine("plugin: " + plugin.Name);
     foreach (var function in plugin)
     {
-        Console.WriteLine("  - prompt function: " + function.Name);
+        Console.WriteLine("  - function: " + function.Name);
     }
 }
 
@@ -45,8 +45,6 @@ var history = new ChatHistory($"""
         如果遇到"今天", "昨天"这样的日期描述，请根据今天的实际日期, 将其转换为具体日期
         """);
 
-
-// Initiate a back-and-forth chat
 string? userInput;
 do
 {
