@@ -8,7 +8,7 @@ using McpDotNet.Client;
 using McpDotNet.Configuration;
 using McpDotNet.Protocol.Transport;
 using Microsoft.Extensions.AI;
-using McpDotNet.Protocol.Types; // Add this using directive
+using McpDotNet.Protocol.Types;
 
 Console.OutputEncoding = System.Text.Encoding.UTF8;
 Console.InputEncoding = System.Text.Encoding.UTF8;
@@ -28,25 +28,25 @@ Kernel kernel = builder.Build();
 
 McpClientOptions options = new()
 {
-    ClientInfo = new() { Name = "TestClient", Version = "1.0.0" }
+    ClientInfo = new() { Name = "MyGitHubClient", Version = "1.0.0" }
 };
 
 McpServerConfig config = new()
 {
-    Id = "everything",
-    Name = "Everything",
+    Id = "github",
+    Name = "GitHubWorkflows",
     TransportType = TransportTypes.StdIo,
     TransportOptions = new()
     {
         ["command"] = "npx",
-        ["arguments"] = "-y @modelcontextprotocol/server-everything",
+        ["arguments"] = "-y @modelcontextprotocol/server-github",
+        ["env:GITHUB_TOKEN"] = "<YOUR_GITHUB_PERSONAL_ACCESS_TOKEN>"
     }
 };
 
-
 var client = await McpClientFactory.CreateAsync(config, options);
 
-var mcpTools = new List<Tool>();
+var mcpTools = new List<Tool>(); 
 await foreach (var tool in client.ListToolsAsync())
 {
     //Console.WriteLine($"{tool.Name} ({tool.Description})");
@@ -89,12 +89,6 @@ foreach (var tool in mcpTools)
 
 // 将函数添加到内核作为插件
 kernel.Plugins.AddFromFunctions("GithubMcpTools", mcpFunctions);
-
-//IList<AIFunction> tools = await client.GetAIFunctionsAsync();
-
-
-//kernel.Plugins.AddFromFunctions("GitHub", tools.Select(aiFunction => aiFunction.AsKernelFunction()));
-
 
 var chatCompletionService = kernel.GetRequiredService<IChatCompletionService>();
 
