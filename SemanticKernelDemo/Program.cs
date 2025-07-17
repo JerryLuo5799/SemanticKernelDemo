@@ -1,14 +1,12 @@
 ﻿using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
-using SemanticKernelDemo.Plugin;
 using Microsoft.SemanticKernel.Plugins.Core;
 using Microsoft.SemanticKernel.Plugins.OpenApi;
-using McpDotNet.Client;
-using McpDotNet.Configuration;
-using McpDotNet.Protocol.Transport;
+using ModelContextProtocol;
+using ModelContextProtocol.Client;
+using ModelContextProtocol.Protocol;
 using Microsoft.Extensions.AI;
-using McpDotNet.Protocol.Types;
 
 Console.OutputEncoding = System.Text.Encoding.UTF8;
 Console.InputEncoding = System.Text.Encoding.UTF8;
@@ -17,7 +15,6 @@ Console.InputEncoding = System.Text.Encoding.UTF8;
 var builder = Kernel.CreateBuilder().AddAzureOpenAIChatCompletion(Config.DEPLOYMENT_NAME, Config.ENDPOINT, Config.API_KEY);
 
 // Add the plugin to the kernel
-builder.Plugins.AddFromType<WeatherPlugin>("Weather");
 builder.Plugins.AddFromPromptDirectory("Plugin");
 builder.Plugins.AddFromType<TimePlugin>("Time");
 
@@ -26,83 +23,85 @@ Kernel kernel = builder.Build();
 
 //await kernel.ImportPluginFromOpenApiAsync("Schedule", new Uri("https://localhost:7293/swagger/v1/swagger.json"), new OpenApiFunctionExecutionParameters() { EnablePayloadNamespacing = true });
 
-McpClientOptions options = new()
+// 创建MCP客户端连接到TestMcpServer
+var clientTransport = new StdioClientTransport(new StdioClientTransportOptions
 {
-    ClientInfo = new() { Name = "MyGitHubClient", Version = "1.0.0" }
-};
+    Name = "TestMcpServer",
+    Command = "dotnet",
+    Arguments = ["run", "--project", "../TestMcpServer/TestMcpServer.csproj"],
+});
 
-// GitHub MCP 配置
-McpServerConfig githubConfig = new()
-{
-    Id = "github",
-    Name = "GitHubWorkflows",
-    TransportType = TransportTypes.StdIo,
-    TransportOptions = new()
-    {
-        ["command"] = "npx",
-        ["arguments"] = "-y @modelcontextprotocol/server-github",
-        ["env:GITHUB_TOKEN"] = "<YOUR_GITHUB_PERSONAL_ACCESS_TOKEN>"
-    }
-};
+// var client = await McpClientFactory.CreateAsync(clientTransport);
 
-// Test MCP 配置
-McpServerConfig testConfig = new()
-{
-    Id = "test",
-    Name = "TestService",
-    TransportType = TransportTypes.StdIo,
-    TransportOptions = new()
-    {
-        ["command"] = "dotnet",
-        ["arguments"] = "run --project ../TestMcpServer/TestMcpServer.csproj"
-    }
-};
+// // 获取所有可用的工具
+// var mcpTools = await client.ListToolsAsync();
 
-var client = await McpClientFactory.CreateAsync(testConfig, options);
+// // 创建 MCP 工具的 Semantic Kernel 函数
+// var mcpFunctions = new List<KernelFunction>();
 
-var mcpTools = new List<Tool>(); 
-await foreach (var tool in client.ListToolsAsync())
-{
-    //Console.WriteLine($"{tool.Name} ({tool.Description})");
-    mcpTools.Add(tool);
-}
-
-// 创建 MCP 工具的 Semantic Kernel 函数
-var mcpFunctions = new List<KernelFunction>();
-
-foreach (var tool in mcpTools)
-{
-    // 捕获当前工具的名称，避免闭包问题
-    var currentToolName = tool.Name;
+// foreach (var tool in mcpTools)
+// {
+//     // 为每个 MCP 工具创建一个函数
+//     var kernelFunction = KernelFunctionFactory.CreateFromMethod(
+//         async (string cityName) =>
+//         {
+//             try
+//             {
+//                 // 根据工具名称调用相应的参数
+//                 var parameters = new Dictionary<string, object?>();
+                
+//                 if (tool.Name == "GetCity")
+//                 {
+//                     parameters["cityName"] = cityName;
+//                 }
+//                 else if (tool.Name == "GetWeatherOfCity")
+//                 {
+//                     // 对于这个工具，cityName参数实际上是cityCode
+//                     parameters["cityCode"] = cityName;
+//                 }
+//                 else if (tool.Name == "GetWeatherByCityName")
+//                 {
+//                     parameters["cityName"] = cityName;
+//                 }
+//                 else
+//                 {
+//                     parameters["input"] = cityName;
+//                 }
+                
+//                 var result = await client.CallToolAsync(tool.Name, parameters);
+                
+//                 // 处理结果内容
+//                 if (result?.Content != null && result.Content.Any())
+//                 {
+//                     var firstContent = result.Content.First();
+//                     if (firstContent.Type == "text")
+//                     {
+//                         // 使用反射获取Text属性或直接转换
+//                         var textProp = firstContent.GetType().GetProperty("Text");
+//                         if (textProp != null)
+//                         {
+//                             return textProp.GetValue(firstContent)?.ToString() ?? "No text content";
+//                         }
+//                     }
+//                     return firstContent.ToString() ?? "No result";
+//                 }
+                
+//                 return "No result";
+//             }
+//             catch (Exception ex)
+//             {
+//                 return $"Error calling {tool.Name}: {ex.Message}";
+//             }
+//         },
+//         functionName: tool.Name,
+//         description: tool.Description ?? $"MCP tool: {tool.Name}"
+//     );
     
-    // 为每个 MCP 工具创建一个函数
-    var kernelFunction = KernelFunctionFactory.CreateFromMethod(
-        async (string input) =>
-        {
-            try
-            {
-                // 调用 MCP 工具 - 修改参数格式
-                var parameters = new Dictionary<string, object>
-                {
-                    ["input"] = input
-                };
-                var result = await client.CallToolAsync(currentToolName, parameters);
-                return result?.ToString() ?? "No result";
-            }
-            catch (Exception ex)
-            {
-                return $"Error calling {currentToolName}: {ex.Message}";
-            }
-        },
-        functionName: tool.Name,
-        description: tool.Description ?? $"MCP tool: {tool.Name}"
-    );
-    
-    mcpFunctions.Add(kernelFunction);
-}
+//     mcpFunctions.Add(kernelFunction);
+// }
 
-// 将函数添加到内核作为插件
-kernel.Plugins.AddFromFunctions("TestMcpTools", mcpFunctions);
+// // 将函数添加到内核作为插件
+// kernel.Plugins.AddFromFunctions("TestMcpTools", mcpFunctions);
 
 var chatCompletionService = kernel.GetRequiredService<IChatCompletionService>();
 

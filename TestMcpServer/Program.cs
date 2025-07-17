@@ -1,7 +1,9 @@
-using System.Text.Json;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.SemanticKernel;
+using ModelContextProtocol.Server;
+using MyPlugin;
 
 namespace TestMcpServer;
 
@@ -9,20 +11,28 @@ class Program
 {
     static async Task Main(string[] args)
     {
-        var host = Host.CreateDefaultBuilder(args)
-            .ConfigureServices(services =>
-            {
-                services.AddSingleton<McpServer>();
-            })
-            .ConfigureLogging(logging =>
-            {
-                logging.ClearProviders();
-                logging.AddConsole();
-                logging.SetMinimumLevel(LogLevel.Information);
-            })
-            .Build();
+        // Create a kernel builder and add plugins from MyPlugin project
+        IKernelBuilder kernelBuilder = Kernel.CreateBuilder();
+        kernelBuilder.Plugins.AddFromType<WeatherPlugin>();
+        
+        // Build the kernel
+        Kernel kernel = kernelBuilder.Build();
 
-        var mcpServer = host.Services.GetRequiredService<McpServer>();
-        await mcpServer.RunAsync();
+        var builder = Host.CreateEmptyApplicationBuilder(settings: null);
+        
+        // Configure logging to stderr (required for MCP)
+        builder.Logging.AddConsole(consoleLogOptions =>
+        {
+            consoleLogOptions.LogToStandardErrorThreshold = LogLevel.Trace;
+        });
+
+        // Configure MCP Server and add all functions from the kernel plugins as MCP tools
+        builder.Services
+            .AddMcpServer()
+            .WithStdioServerTransport()
+            // Add all functions from the kernel plugins to the MCP server as tools
+            .WithTools(kernel);
+
+        await builder.Build().RunAsync();
     }
 }

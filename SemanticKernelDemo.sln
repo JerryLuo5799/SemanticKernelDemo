@@ -12,6 +12,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Module.API", "Module.API\Mo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestMcpServer", "TestMcpServer\TestMcpServer.csproj", "{C7529B0B-54CE-4361-A900-89571644E610}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyPlugin", "MyPlugin\MyPlugin.csproj", "{0DF5C3D2-9DBE-4F5C-8EB5-E6B71EFBA7B1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -58,6 +60,18 @@ Global
 		{C7529B0B-54CE-4361-A900-89571644E610}.Release|x64.Build.0 = Release|Any CPU
 		{C7529B0B-54CE-4361-A900-89571644E610}.Release|x86.ActiveCfg = Release|Any CPU
 		{C7529B0B-54CE-4361-A900-89571644E610}.Release|x86.Build.0 = Release|Any CPU
+		{0DF5C3D2-9DBE-4F5C-8EB5-E6B71EFBA7B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0DF5C3D2-9DBE-4F5C-8EB5-E6B71EFBA7B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0DF5C3D2-9DBE-4F5C-8EB5-E6B71EFBA7B1}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{0DF5C3D2-9DBE-4F5C-8EB5-E6B71EFBA7B1}.Debug|x64.Build.0 = Debug|Any CPU
+		{0DF5C3D2-9DBE-4F5C-8EB5-E6B71EFBA7B1}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{0DF5C3D2-9DBE-4F5C-8EB5-E6B71EFBA7B1}.Debug|x86.Build.0 = Debug|Any CPU
+		{0DF5C3D2-9DBE-4F5C-8EB5-E6B71EFBA7B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0DF5C3D2-9DBE-4F5C-8EB5-E6B71EFBA7B1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0DF5C3D2-9DBE-4F5C-8EB5-E6B71EFBA7B1}.Release|x64.ActiveCfg = Release|Any CPU
+		{0DF5C3D2-9DBE-4F5C-8EB5-E6B71EFBA7B1}.Release|x64.Build.0 = Release|Any CPU
+		{0DF5C3D2-9DBE-4F5C-8EB5-E6B71EFBA7B1}.Release|x86.ActiveCfg = Release|Any CPU
+		{0DF5C3D2-9DBE-4F5C-8EB5-E6B71EFBA7B1}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,33 +1,31 @@
-# Test MCP Server
+# TestMcpServer - Semantic Kernel Plugin MCP Server
 
-这是一个基于Model Context Protocol (MCP)的测试服务器，将原有的WeatherPlugin转换为可独立运行的MCP服务。
+这是一个基于官方ModelContextProtocol SDK实现的MCP服务器，将MyPlugin项目中的Semantic Kernel插件动态转换为MCP工具。
 
 ## 项目结构
 
 ```
 TestMcpServer/
-├── Program.cs              # 主程序入口
-├── McpServer.cs           # MCP服务器实现
-├── McpProtocol.cs         # MCP协议定义
-├── WeatherService.cs      # 天气服务逻辑
-└── TestMcpServer.csproj   # 项目文件
+├── Program.cs                      # 主程序入口，加载MyPlugin并启动MCP服务器
+├── McpServerBuilderExtensions.cs   # 扩展方法，将Kernel插件转换为MCP工具
+└── TestMcpServer.csproj            # 项目文件
 ```
 
-## 功能
+## 技术实现
 
-Test MCP服务器提供以下工具：
+### 核心特性
+- **动态插件加载**: 自动加载MyPlugin项目中的所有Semantic Kernel插件
+- **官方SDK**: 使用ModelContextProtocol 0.3.0-preview.3官方包
+- **扩展方法**: 实现WithTools扩展方法，将Kernel函数转换为MCP工具
+- **标准通信**: 支持stdio传输协议
+
+### 自动暴露的工具
+服务器会自动将MyPlugin中WeatherPlugin的所有函数暴露为MCP工具：
 
 1. **get_city** - 根据城市名称获取城市信息
-   - 参数: `cityName` (string) - 城市名称
-   - 返回: 城市信息包含城市代码和名称
-
-2. **get_weather_of_city** - 根据城市代码获取天气信息
-   - 参数: `cityCode` (string) - 城市代码
-   - 返回: 天气信息包含温度和天气状况
-
-3. **get_weather_by_city_name** - 根据城市名称直接获取天气信息
-   - 参数: `cityName` (string) - 城市名称
-   - 返回: 天气信息包含温度和天气状况
+2. **get_weather_of_city** - 根据城市对象获取天气信息  
+3. **get_weather_of_city_by_city_code** - 根据城市代码获取天气信息
+4. **get_weather_by_city_name** - 根据城市名称直接获取天气信息
 
 ## 支持的城市
 
