@@ -2,119 +2,114 @@
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
 using Microsoft.SemanticKernel.Plugins.Core;
-using Microsoft.SemanticKernel.Plugins.OpenApi;
 using ModelContextProtocol;
 using ModelContextProtocol.Client;
 using ModelContextProtocol.Protocol;
-using Microsoft.Extensions.AI;
 
 Console.OutputEncoding = System.Text.Encoding.UTF8;
 Console.InputEncoding = System.Text.Encoding.UTF8;
 
-// Create a kernel with Azure OpenAI chat completion
-var builder = Kernel.CreateBuilder().AddAzureOpenAIChatCompletion(Config.DEPLOYMENT_NAME, Config.ENDPOINT, Config.API_KEY);
+// Create a kernel builder
+IKernelBuilder kernelBuilder = Kernel.CreateBuilder();
 
-// Add the plugin to the kernel
-builder.Plugins.AddFromPromptDirectory("Plugin");
-builder.Plugins.AddFromType<TimePlugin>("Time");
+// Add the local plugins first
+kernelBuilder.Plugins.AddFromPromptDirectory("Plugin");
+kernelBuilder.Plugins.AddFromType<TimePlugin>("Time");
 
-// Build the kernel
-Kernel kernel = builder.Build();
-
-//await kernel.ImportPluginFromOpenApiAsync("Schedule", new Uri("https://localhost:7293/swagger/v1/swagger.json"), new OpenApiFunctionExecutionParameters() { EnablePayloadNamespacing = true });
-
-// 创建MCP客户端连接到TestMcpServer
-var clientTransport = new StdioClientTransport(new StdioClientTransportOptions
+// Build MCP Client and Use MCP tools as SK plugins
+await using IMcpClient mcpClient = await McpClientFactory.CreateAsync(new StdioClientTransport(new StdioClientTransportOptions
 {
     Name = "TestMcpServer",
     Command = "dotnet",
-    Arguments = ["run", "--project", "../TestMcpServer/TestMcpServer.csproj"],
-});
+    Arguments = ["run", "--project", "../TestMcpServer/TestMcpServer.csproj"]
+}));
 
-// var client = await McpClientFactory.CreateAsync(clientTransport);
+// Get MCP tools from the server
+var mcpTools = await mcpClient.ListToolsAsync();
 
-// // 获取所有可用的工具
-// var mcpTools = await client.ListToolsAsync();
-
-// // 创建 MCP 工具的 Semantic Kernel 函数
-// var mcpFunctions = new List<KernelFunction>();
-
-// foreach (var tool in mcpTools)
-// {
-//     // 为每个 MCP 工具创建一个函数
-//     var kernelFunction = KernelFunctionFactory.CreateFromMethod(
-//         async (string cityName) =>
-//         {
-//             try
-//             {
-//                 // 根据工具名称调用相应的参数
-//                 var parameters = new Dictionary<string, object?>();
+Console.WriteLine($"Found {mcpTools.Count} MCP tools:");
+foreach (var tool in mcpTools)
+{
+    Console.WriteLine($"  - {tool.Name}: {tool.Description}");
+}
+// Add MCP tools as SK functions using completely dynamic approach (following official blog)
+var mcpFunctions = new List<KernelFunction>();
+foreach (var tool in mcpTools)
+{
+    var function = KernelFunctionFactory.CreateFromMethod(
+        async (KernelArguments arguments) =>
+        {
+            try
+            {
+                // Convert KernelArguments to Dictionary for MCP call
+                var mcpArguments = new Dictionary<string, object?>();
+                foreach (var arg in arguments)
+                {
+                    mcpArguments[arg.Key] = arg.Value;
+                }
                 
-//                 if (tool.Name == "GetCity")
-//                 {
-//                     parameters["cityName"] = cityName;
-//                 }
-//                 else if (tool.Name == "GetWeatherOfCity")
-//                 {
-//                     // 对于这个工具，cityName参数实际上是cityCode
-//                     parameters["cityCode"] = cityName;
-//                 }
-//                 else if (tool.Name == "GetWeatherByCityName")
-//                 {
-//                     parameters["cityName"] = cityName;
-//                 }
-//                 else
-//                 {
-//                     parameters["input"] = cityName;
-//                 }
+                var result = await mcpClient.CallToolAsync(tool.Name, mcpArguments);
                 
-//                 var result = await client.CallToolAsync(tool.Name, parameters);
+                // Dynamically extract result content using reflection
+                if (result != null)
+                {
+                    var resultType = result.GetType();
+                    var contentProperty = resultType.GetProperty("Content");
+                    if (contentProperty != null)
+                    {
+                        var content = contentProperty.GetValue(result);
+                        
+                        if (content is IEnumerable<object> contentList)
+                        {
+                            var contentBlocks = contentList.ToList();
+                            if (contentBlocks.Count > 0)
+                            {
+                                var firstBlock = contentBlocks[0];
+                                var blockType = firstBlock.GetType();
+                                var textProperty = blockType.GetProperty("Text");
+                                if (textProperty != null)
+                                {
+                                    var textValue = textProperty.GetValue(firstBlock);
+                                    return textValue?.ToString() ?? "No text content";
+                                }
+                                return firstBlock.ToString() ?? "No content";
+                            }
+                        }
+                        return content?.ToString() ?? "No content";
+                    }
+                    return result.ToString() ?? "No result";
+                }
                 
-//                 // 处理结果内容
-//                 if (result?.Content != null && result.Content.Any())
-//                 {
-//                     var firstContent = result.Content.First();
-//                     if (firstContent.Type == "text")
-//                     {
-//                         // 使用反射获取Text属性或直接转换
-//                         var textProp = firstContent.GetType().GetProperty("Text");
-//                         if (textProp != null)
-//                         {
-//                             return textProp.GetValue(firstContent)?.ToString() ?? "No text content";
-//                         }
-//                     }
-//                     return firstContent.ToString() ?? "No result";
-//                 }
-                
-//                 return "No result";
-//             }
-//             catch (Exception ex)
-//             {
-//                 return $"Error calling {tool.Name}: {ex.Message}";
-//             }
-//         },
-//         functionName: tool.Name,
-//         description: tool.Description ?? $"MCP tool: {tool.Name}"
-//     );
+                return "No result from MCP tool";
+            }
+            catch (Exception ex)
+            {
+                return $"Error calling MCP tool: {ex.Message}";
+            }
+        },
+        functionName: tool.Name,
+        description: tool.Description ?? $"MCP tool: {tool.Name}"
+    );
     
-//     mcpFunctions.Add(kernelFunction);
-// }
+    mcpFunctions.Add(function);
+}
 
-// // 将函数添加到内核作为插件
-// kernel.Plugins.AddFromFunctions("TestMcpTools", mcpFunctions);
+kernelBuilder.Plugins.AddFromFunctions("McpTools", mcpFunctions);
+
+// Add Azure OpenAI chat completion
+kernelBuilder.AddAzureOpenAIChatCompletion(Config.DEPLOYMENT_NAME, Config.ENDPOINT, Config.API_KEY);
+
+// Build the kernel
+Kernel kernel = kernelBuilder.Build();
 
 var chatCompletionService = kernel.GetRequiredService<IChatCompletionService>();
 
 foreach (var plugin in kernel.Plugins)
 {
-    Console.WriteLine("plugin: " + plugin.Name);
-    foreach (var function in plugin)
-    {
-        Console.WriteLine($"  - function: {function.Name}, Description: {function.Description}");
-    }
+    Console.WriteLine($"Plugin: {plugin.Name} ({plugin.Count()} functions)");
 }
 
-// 2. Enable automatic function calling
+// Enable automatic function calling
 PromptExecutionSettings executionSettings = new()
 {
     FunctionChoiceBehavior = FunctionChoiceBehavior.Auto(),
@@ -136,7 +131,7 @@ do
 
     userInput = Console.ReadLine();
     // Add user input
-    history.AddUserMessage(userInput ?? string.Empty); // Fix for possible null reference
+    history.AddUserMessage(userInput ?? string.Empty);
 
     // Get the response from the AI
     var result = await chatCompletionService.GetChatMessageContentAsync(history, executionSettings, kernel);

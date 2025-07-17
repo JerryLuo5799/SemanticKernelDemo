@@ -18,16 +18,16 @@ public class WeatherPlugin
     }
 
     [KernelFunction("get_city")]
-    [Description("Gets a city by cityName")]
-    public async Task<CityModel> GetCityAsync([Description("The name of the city")] string cityName)
+    [Description("Gets a city by cityName. Input: cityName (string) - 城市名称，如：杭州、北京、上海")]
+    public async Task<CityModel> GetCityAsync([Description("城市名称")] string cityName)
     {
         var city = _cityList.Where(a => a.Name == cityName).FirstOrDefault();
         return await Task.FromResult(city ?? new CityModel());
     }
 
     [KernelFunction("get_weather_of_city")]
-    [Description("Get the current weather in a given city.")]
-    public static async Task<WeatherModel> GetWeatherOfCityAsync([Description("The city to get weather for")] CityModel city)
+    [Description("Get the current weather in a given city. Input: city (CityModel) - 城市对象")]
+    public static async Task<WeatherModel> GetWeatherOfCityAsync([Description("城市对象")] CityModel city)
     {
         var weather = city.Code switch
         {
@@ -40,8 +40,8 @@ public class WeatherPlugin
     }
 
     [KernelFunction("get_weather_of_city_by_city_code")]
-    [Description("Get the current weather in a given city by city code.")]
-    public async Task<WeatherModel> GetWeatherOfCityByCityCodeAsync([Description("The city code")] string cityCode)
+    [Description("Get the current weather in a given city by city code. Input: cityCode (string) - 城市代码，如：hangzhou、beijing、shanghai")]
+    public async Task<WeatherModel> GetWeatherOfCityByCityCodeAsync([Description("城市代码")] string cityCode)
     {
         var weather = cityCode switch
         {
@@ -54,8 +54,8 @@ public class WeatherPlugin
     }
 
     [KernelFunction("get_weather_by_city_name")]
-    [Description("Get the current weather by city name directly.")]
-    public async Task<string> GetWeatherByCityNameAsync([Description("The name of the city")] string cityName)
+    [Description("Get the current weather by city name directly. Input: cityName (string) - 城市名称，如：杭州、北京、上海")]
+    public async Task<string> GetWeatherByCityNameAsync([Description("城市名称")] string cityName)
     {
         var city = await GetCityAsync(cityName);
         if (!string.IsNullOrEmpty(city.Code))
