@@ -31,7 +31,8 @@ McpClientOptions options = new()
     ClientInfo = new() { Name = "MyGitHubClient", Version = "1.0.0" }
 };
 
-McpServerConfig config = new()
+// GitHub MCP 配置
+McpServerConfig githubConfig = new()
 {
     Id = "github",
     Name = "GitHubWorkflows",
@@ -44,7 +45,20 @@ McpServerConfig config = new()
     }
 };
 
-var client = await McpClientFactory.CreateAsync(config, options);
+// Test MCP 配置
+McpServerConfig testConfig = new()
+{
+    Id = "test",
+    Name = "TestService",
+    TransportType = TransportTypes.StdIo,
+    TransportOptions = new()
+    {
+        ["command"] = "dotnet",
+        ["arguments"] = "run --project ../TestMcpServer/TestMcpServer.csproj"
+    }
+};
+
+var client = await McpClientFactory.CreateAsync(testConfig, options);
 
 var mcpTools = new List<Tool>(); 
 await foreach (var tool in client.ListToolsAsync())
@@ -88,7 +102,7 @@ foreach (var tool in mcpTools)
 }
 
 // 将函数添加到内核作为插件
-kernel.Plugins.AddFromFunctions("GithubMcpTools", mcpFunctions);
+kernel.Plugins.AddFromFunctions("TestMcpTools", mcpFunctions);
 
 var chatCompletionService = kernel.GetRequiredService<IChatCompletionService>();
 
