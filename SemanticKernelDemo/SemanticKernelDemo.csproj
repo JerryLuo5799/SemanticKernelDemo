@@ -10,8 +10,8 @@
 
   <ItemGroup>
     <PackageReference Include="Azure.Search.Documents" Version="11.6.0" />
-    <PackageReference Include="Microsoft.Extensions.AI" Version="9.0.0" />
     <PackageReference Include="ModelContextProtocol" Version="0.3.0-preview.3" />
+    <PackageReference Include="Microsoft.Extensions.AI" Version="9.5.0" />
     <PackageReference Include="Microsoft.SemanticKernel" Version="1.54.0" />
     <PackageReference Include="Microsoft.SemanticKernel.Plugins.Core" Version="1.54.0-preview" />
     <PackageReference Include="Microsoft.SemanticKernel.Plugins.OpenApi" Version="1.54.0" />

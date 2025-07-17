@@ -12,7 +12,8 @@ public static class McpServerBuilderExtensions
         {
             foreach (var function in plugin)
             {
-                builder.Services.AddSingleton(services => McpServerTool.Create(function.AsAIFunction()));
+                // Use the kernel function directly as recommended
+                builder.Services.AddSingleton(services => McpServerTool.Create(function));
             }
         }
 
