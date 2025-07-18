@@ -94,7 +94,7 @@ foreach (var tool in mcpTools)
     mcpFunctions.Add(function);
 }
 
-kernelBuilder.Plugins.AddFromFunctions("McpTools", mcpFunctions);
+kernelBuilder.Plugins.AddFromFunctions("PluginsFromMcpTools", mcpFunctions);
 
 // Add Azure OpenAI chat completion
 kernelBuilder.AddAzureOpenAIChatCompletion(Config.DEPLOYMENT_NAME, Config.ENDPOINT, Config.API_KEY);
@@ -104,9 +104,14 @@ Kernel kernel = kernelBuilder.Build();
 
 var chatCompletionService = kernel.GetRequiredService<IChatCompletionService>();
 
+// Print all available functions in the kernel
 foreach (var plugin in kernel.Plugins)
 {
-    Console.WriteLine($"Plugin: {plugin.Name} ({plugin.Count()} functions)");
+    Console.WriteLine("plugin: " + plugin.Name);
+    foreach (var function in plugin)
+    {
+        Console.WriteLine("  - prompt function: " + function.Name);
+    }
 }
 
 // Enable automatic function calling
