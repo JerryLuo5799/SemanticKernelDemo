@@ -45,7 +45,7 @@ public class WeatherPlugin
     {
         var weather = cityCode switch
         {
-            "hangzhou" => new WeatherModel { Temperature = 5, Condition = "下雨" },
+            "hangzhou" => new WeatherModel { Temperature = 32, Condition = "小雨" },
             "beijing" => new WeatherModel { Temperature = 10, Condition = "多云" },
             "shanghai" => new WeatherModel { Temperature = 15, Condition = "晴" },
             _ => new WeatherModel { Temperature = 0, Condition = "未知" }

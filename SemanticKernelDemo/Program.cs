@@ -94,7 +94,7 @@ foreach (var tool in mcpTools)
     mcpFunctions.Add(function);
 }
 
-kernelBuilder.Plugins.AddFromFunctions("PluginsFromMcpTools", mcpFunctions);
+kernelBuilder.Plugins.AddFromFunctions("PluginsFromMcp", mcpFunctions);
 
 // Add Azure OpenAI chat completion
 kernelBuilder.AddAzureOpenAIChatCompletion(Config.DEPLOYMENT_NAME, Config.ENDPOINT, Config.API_KEY);
@@ -110,7 +110,7 @@ foreach (var plugin in kernel.Plugins)
     Console.WriteLine("plugin: " + plugin.Name);
     foreach (var function in plugin)
     {
-        Console.WriteLine("  - prompt function: " + function.Name);
+        Console.WriteLine("  - function: " + function.Name);
     }
 }
 
